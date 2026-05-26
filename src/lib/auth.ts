@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import authConfig from "./auth.config";
 import { prisma } from "./prisma";
 
 export const {
@@ -9,6 +10,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  ...authConfig,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -48,10 +50,8 @@ export const {
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
@@ -66,28 +66,5 @@ export const {
       }
       return session;
     },
-    authorized({ auth, request }) {
-      const { nextUrl } = request;
-      const isLoggedIn = !!auth?.user;
-      const isAdmin = auth?.user?.role === "ADMIN";
-
-      const protectedPaths = ["/dashboard", "/plan", "/weight", "/inbody", "/nutrition", "/profile"];
-      const isProtected = protectedPaths.some((p) => nextUrl.pathname.startsWith(p));
-      const isAdminPath = nextUrl.pathname.startsWith("/admin");
-
-      if (isAdminPath && !isAdmin) {
-        return false;
-      }
-
-      if ((isProtected || isAdminPath) && !isLoggedIn) {
-        return false;
-      }
-
-      return true;
-    },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
   },
 });
