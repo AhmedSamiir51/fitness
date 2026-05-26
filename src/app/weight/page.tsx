@@ -151,8 +151,8 @@ export default function WeightPage() {
               <CardTitle>رسم بياني لتطور الوزن</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] w-full" dir="ltr">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-[300px] w-full min-w-0" dir="ltr">
+                <ResponsiveContainer width="100%" height={300} minWidth={0}>
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                     <XAxis dataKey="date" stroke="#888" fontSize={12} />
